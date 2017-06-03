@@ -1,3 +1,4 @@
+from __future__ import print_function
 import string
 import sys
 from collections import defaultdict
@@ -78,28 +79,35 @@ def Preprocess(trees):
 def TreeToString(tree):
     # remove spaces between parentheses
     special = ['(', ')']
-    output = []
+    output = ''
     for i in range(len(tree)):
-        output.append(tree[i])
+        output += tree[i]
         if i == len(tree) - 1:
             continue
         else:
             if tree[i] in special and tree[i + 1] in special:
-                output.append(' ')
+                continue
+            if tree[i] == '(' or tree[i + 1] == ')':
+                continue
+            output += ' '
+
+    return output
 
 
 if __name__ == '__main__':
-    trees = sys.stdin.readlines()
+    #trees = sys.stdin.readlines()
+    trees = ['(Here is (a ((tree) i )) guess)']
     trees, counts = Preprocess(trees)
 
     for t in trees:
-        line = t[0]
-        for i in range(len(t)):
-            line += t[i] + ' '
-            # if t[i] == '(' or t[i] == ')':
-            #     line += t[i]
-            # else:
-            #     line += t[i] + ' '
+        line = TreeToString(t)
+        # line = t[0]
+        # for i in range(len(t)):
+        #     line += t[i] + ' '
+        #     # if t[i] == '(' or t[i] == ')':
+        #     #     line += t[i]
+        #     # else:
+        #     #     line += t[i] + ' '
         print(line)
 
     for w, c in counts.items():
