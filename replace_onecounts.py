@@ -79,7 +79,13 @@ if __name__ == '__main__':
     trees, counts = Preprocess(trees)
 
     for t in trees:
-        print(t)
+        line = t[0]
+        for i in range(len(t)):
+            if t[i] == '(' or t[i] == ')':
+                line.append(t[i])
+            else:
+                line.append(' ' + t[i])
+        print(line)
 
     for w, c in counts.items():
         if c > 1:
