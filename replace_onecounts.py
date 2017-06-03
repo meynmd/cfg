@@ -84,7 +84,7 @@ if __name__ == '__main__':
             if t[i] == '(' or t[i] == ')':
                 line += t[i]
             else:
-                line += ' ' + t[i]
+                line += t[i] + ' '
         print(line)
 
     for w, c in counts.items():
