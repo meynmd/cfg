@@ -81,10 +81,11 @@ if __name__ == '__main__':
     for t in trees:
         line = t[0]
         for i in range(len(t)):
-            if t[i] == '(':
-                line += t[i]
-            else:
-                line += t[i] + ' '
+            line += t[i] + ' '
+            # if t[i] == '(' or t[i] == ')':
+            #     line += t[i]
+            # else:
+            #     line += t[i] + ' '
         print(line)
 
     for w, c in counts.items():
