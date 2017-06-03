@@ -95,8 +95,7 @@ def TreeToString(tree):
 
 
 if __name__ == '__main__':
-    #trees = sys.stdin.readlines()
-    trees = ['(Here is (a ((tree) i )) guess)']
+    trees = sys.stdin.readlines()
     trees, counts = Preprocess(trees)
 
     for t in trees:
