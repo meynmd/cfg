@@ -53,7 +53,6 @@ def RemoveChars(line, to_remove):
 
 def RemoveSingletons(trees):
     # find words that occur only once
-    result = []
     counts = defaultdict(int)
     for t in trees:
         for w in ExtractWords(t, LangChars):
@@ -61,19 +60,22 @@ def RemoveSingletons(trees):
     singletons = [w for w in counts.keys() if counts[w] < 2]
 
     # rewrite the trees with <unk>
-    for t in trees:
-        tokens = ExtractWords(t, LangChars + '()')
+    new_trees = []
+    for tree in trees:
+        result = []
+        tokens = ExtractWords(tree, LangChars + '()')
         tokens = ExtractPunct(tokens, '()')
         for t in tokens:
             if t not in singletons:
                 result.append(t)
             else:
                 result.append('<unk>')
+        new_trees.append(result)
 
-    return result
+    return new_trees
 
 if __name__ == '__main__':
     trees = sys.stdin.readlines()
     trees = RemoveSingletons(trees)
     for t in trees:
-        print (t)
+        print(t)
