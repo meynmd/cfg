@@ -74,6 +74,20 @@ def Preprocess(trees):
 
     return new_trees, counts
 
+
+def TreeToString(tree):
+    # remove spaces between parentheses
+    special = ['(', ')']
+    output = []
+    for i in range(len(tree)):
+        output.append(tree[i])
+        if i == len(tree) - 1:
+            continue
+        else:
+            if tree[i] in special and tree[i + 1] in special:
+                output.append(' ')
+
+
 if __name__ == '__main__':
     trees = sys.stdin.readlines()
     trees, counts = Preprocess(trees)
