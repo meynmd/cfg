@@ -82,9 +82,9 @@ if __name__ == '__main__':
         line = t[0]
         for i in range(len(t)):
             if t[i] == '(' or t[i] == ')':
-                line.append(t[i])
+                line += t[i]
             else:
-                line.append(' ' + t[i])
+                line += ' ' + t[i]
         print(line)
 
     for w, c in counts.items():
