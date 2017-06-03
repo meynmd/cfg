@@ -51,7 +51,7 @@ def RemoveChars(line, to_remove):
     return tokens
 
 
-def RemoveSingletons(trees):
+def Preprocess(trees):
     # find words that occur only once
     counts = defaultdict(int)
     for t in trees:
@@ -72,10 +72,15 @@ def RemoveSingletons(trees):
                 result.append('<unk>')
         new_trees.append(result)
 
-    return new_trees
+    return new_trees, counts
 
 if __name__ == '__main__':
     trees = sys.stdin.readlines()
-    trees = RemoveSingletons(trees)
+    trees, counts = Preprocess(trees)
+
     for t in trees:
         print(t)
+
+    for w, c in counts.items():
+        if c > 1:
+            print(w, file = sys.stderr)
