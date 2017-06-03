@@ -74,4 +74,6 @@ def RemoveSingletons(trees):
 
 if __name__ == '__main__':
     trees = sys.stdin.readlines()
-    print RemoveSingletons(trees)
+    trees = RemoveSingletons(trees)
+    for t in trees:
+        print (t)
