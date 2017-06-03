@@ -1,4 +1,5 @@
 import string
+import sys
 from collections import defaultdict
 
 LangChars = string.ascii_letters + ',.?!\''
@@ -12,10 +13,6 @@ def ExtractPunct(words, punct_chars):
 
 
 def ExtractPunctFromWord(word, punct_chars):
-
-    # if len(word) < 2:
-    #     return word
-    #
     for i in range(len(word)):
         if word[i] in punct_chars:
             break
@@ -29,11 +26,6 @@ def ExtractPunctFromWord(word, punct_chars):
             return [word]
     else:
         return [word]
-
-    # if word[0] in punct_chars:
-    #     return [word[0]] + ExtractPunctFromWord(word[1 :], punct_chars)
-    # else:
-    #     return [word[0] + ExtractPunctFromWord(word[1 :], punct_chars)]
 
 
 def ExtractWords(line, word_chars):
@@ -61,16 +53,25 @@ def RemoveChars(line, to_remove):
 
 def RemoveSingletons(trees):
     # find words that occur only once
+    result = []
     counts = defaultdict(int)
-    singletons = set()
     for t in trees:
-        for w in ExtractWords(t, SemanticChars):
+        for w in ExtractWords(t, LangChars):
             counts[w] += 1
+    singletons = [w for w in counts.keys() if counts[w] < 2]
 
+    # rewrite the trees with <unk>
+    for t in trees:
+        tokens = ExtractWords(t, LangChars + '()')
+        tokens = ExtractPunct(tokens, '()')
+        for t in tokens:
+            if t not in singletons:
+                result.append(t)
+            else:
+                result.append('<unk>')
 
-
-
+    return result
 
 if __name__ == '__main__':
-    w = ExtractWords('Hello! (Here, is a line)', string.ascii_letters + LangChars + '()')
-    print ExtractPunct(w, '()')
+    trees = sys.stdin.readlines()
+    print RemoveSingletons(trees)
