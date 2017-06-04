@@ -1,47 +1,24 @@
-from preprocess import *
-from itertools import takewhile
+from tree import Tree
+from collections import defaultdict
+import sys
 
-def BinarizeTrees(trees):
-    #
-    new_trees = []
-    for tree in trees:
-        output = []
-        tokens = ExtractWords(tree, LangChars + '()')
-        tokens = ExtractPunct(tokens, '()')
-        new_trees.append(BinarizeTree(tokens))
-
-    return new_trees
-
-
-def BinarizeTree(tree, name):
-    if len(tree) <= 2:
+def binarize(tree): 
+    # terminal
+    if tree.word is not None:
         return tree
-
-    # the stuff to binarize right now
-    nodes = [n for n in takewhile(lambda x: x not in ['(', ')'], tree)]
-    if len(nodes > 0):
-        output = [nodes[0]]
-    else:
-        output = []
-
-    if len(nodes) < len(tree):
-        # there may be stuff we still have to binarize later
-        rest = tree[len(nodes) :]
-
-    if len(nodes) > 2:
-        # insert new subtree
-        output.append(name + '\'')
-        output.append('(')
-        output = output + BinarizeTree(nodes[1 :], name + '\'')
-        output.append(')')
-
-    if rest[0] == '(':
-        output.append(rest[0])
-        subtree = takewhile(lambda x: x != ')', rest[1 :])
-        output = output + BinarizeTree(subtree)
-        output.append(rest[len(subtree) :])
-
-    return output
+    if len(tree.subs) > 2:
+        label = tree.label
+        span = [tree.span[0]+1, tree.span[1]]
+        if label[-1] != '\'':
+            label += '\''         
+        sub = Tree(label, span, subs = tree.subs[1:])        
+        tree.subs = [tree.subs[0], sub]    
+    for t in tree.subs:                
+        binarize(t)
+    return tree
 
 
-trees = sys.stdin.readlines()
+
+if __name__=='__main__':    
+    for i, line in enumerate(sys.stdin):
+        print binarize(Tree.parse(line.strip(), trunc=True))
