@@ -20,6 +20,7 @@ def LearnGrammar(trees):
 
 def CountProductions(tree, counts):
     if tree.subs == None:
+        counts[tree.label][(tree.word, '')] += 1
         return
     rhs = tuple(s.label for s in tree.subs)
     counts[tree.label][rhs] += 1
@@ -35,7 +36,7 @@ def PrintGrammar(grammar):
             print '{} ->'.format(lhs),
             for r in rhs:
                 print '{}'.format(r),
-            print '# {}'.format(prob)
+            print '# {:.4f}'.format(prob)
 
 
 if __name__ == '__main__':
