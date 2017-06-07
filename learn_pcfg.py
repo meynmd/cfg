@@ -40,8 +40,8 @@ def PrintGrammar(grammar):
 
 
 if __name__ == '__main__':
-    #with open('train.trees', 'r') as fp:
-    with sys.stdin as fp:
+    with open('train.trees.unk.bin', 'r') as fp:
+        #with sys.stdin as fp:
         lines = fp.readlines()
         trees = []
         for line in lines:

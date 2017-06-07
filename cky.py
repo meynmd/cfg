@@ -2,27 +2,28 @@ from collections import defaultdict
 import sys
 
 
-def cky(grammer, words, vocab = None):    
+def cky(grammar, words, vocab = None):
     if len(words) == 1:
         trml = words[0]        
         if trml not in vocab:
             trml = '<unk>'  
-        return max([(grammer[trml][lhs], lhs, '({0} {1})'.format(lhs, words[0])) \
-                    for lhs in grammer[trml]])
+        return max([(grammar[trml][lhs], lhs, '({0} {1})'.format(lhs, words[0])) \
+                    for lhs in grammar[trml]])
 
     score = [(0.0, '<NoN>', '<NoN>')]   
 
     for i in xrange(1, len(words)):
-        lrhs_prob, lrhs, lrule = cky(grammer, words[:i], vocab)
-        rrhs_prob, rrhs, rrule = cky(grammer, words[i:], vocab)        
+        lrhs_prob, lrhs, lrule = cky(grammar, words[:i], vocab)
+        rrhs_prob, rrhs, rrule = cky(grammar, words[i:], vocab)
         rhs = lrhs + ' ' + rrhs                
-        if rhs in grammer:           
-            score += [max([(grammer[rhs][lhs]*lrhs_prob*rrhs_prob, lhs, '({0} ({1} {2})'.format(lhs, lrule, rrule)) \
-                    for lhs in grammer[rhs]])]
+        if rhs in grammar:
+            score += [max([(grammar[rhs][lhs] * lrhs_prob * rrhs_prob, lhs, '({0} ({1} {2})'.format(lhs, lrule, rrule)) \
+                           for lhs in grammar[rhs]])]
     # print score
     return max(score)
 
-def build_grammer(filename):
+
+def build_grammar(filename):
     p_lhs_rhs = defaultdict(lambda:defaultdict(float))
     with open(filename, 'r') as fp:
         for line in fp:
@@ -35,23 +36,24 @@ def build_grammer(filename):
     return p_lhs_rhs
 
 
-
-
 if __name__=='__main__':    
     if len(sys.argv) < 2:
-        print 'you need to provide a pcfg grammer as an input'        
+        grammar_filename = 'grammar.pcfg'
     else:
-        grammer_filename = sys.argv[1]
-        if len(sys.argv) == 3:
-            train_dict_filename = sys.argv[2]
-            with open(train_dict_filename, 'r') as fp:
-                vocab = fp.readlines()
-                vocab = map(str.strip, vocab)                
-        else:
-            vocab = None
+        grammar_filename = sys.argv[1]
 
-    p_lhs_rhs = build_grammer(grammer_filename)    
-    for line in sys.stdin:
+    if len(sys.argv) == 3:
+        train_dict_filename = sys.argv[2]
+    else:
+        train_dict_filename = 'train.dict'
+
+    with open(train_dict_filename, 'r') as fp:
+        vocab = fp.readlines()
+        vocab = map(str.strip, vocab)
+
+    p_lhs_rhs = build_grammar(grammar_filename)
+    #for line in sys.stdin:
+    for line in open('test.txt', 'r').readlines():
         print cky(p_lhs_rhs, line.strip().split(), vocab)
 
 
