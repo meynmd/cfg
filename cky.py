@@ -2,17 +2,24 @@ from collections import defaultdict
 import sys
 
 
-def cky(grammer, words, vocab = None, lhs = 'TOP'):
+def cky(grammer, words, vocab = None):    
     if len(words) == 1:
-        trml = words[0]
-        return max([(grammer[trml][lhs], lhs) for lhs in grammer[trml]])
+        trml = words[0]        
+        if trml not in vocab:
+            trml = '<unk>'  
+        return max([(grammer[trml][lhs], lhs, '({0} {1})'.format(lhs, words[0])) \
+                    for lhs in grammer[trml]])
 
-    score = []
+    score = [(0.0, '<NoN>', '<NoN>')]   
+
     for i in xrange(1, len(words)):
-        lrhs_prob, lrhs = cky(grammer, words[:i], vocab, lhs)
-        rrhs_prob, rrhs = cky(grammer, words[i:], vocab, lhs)
-        rhs = lrhs + ' ' + rrhs
-        score += [max([tuple(grammer[rhs][lhs]*lrhs_prob*rrhs_prob, lhs) for lhs in grammer[rhs]])]
+        lrhs_prob, lrhs, lrule = cky(grammer, words[:i], vocab)
+        rrhs_prob, rrhs, rrule = cky(grammer, words[i:], vocab)        
+        rhs = lrhs + ' ' + rrhs                
+        if rhs in grammer:           
+            score += [max([(grammer[rhs][lhs]*lrhs_prob*rrhs_prob, lhs, '({0} ({1} {2})'.format(lhs, lrule, rrule)) \
+                    for lhs in grammer[rhs]])]
+    # print score
     return max(score)
 
 def build_grammer(filename):
@@ -30,7 +37,7 @@ def build_grammer(filename):
 
 
 
-if __name__=='__main__':
+if __name__=='__main__':    
     if len(sys.argv) < 2:
         print 'you need to provide a pcfg grammer as an input'        
     else:
@@ -39,11 +46,11 @@ if __name__=='__main__':
             train_dict_filename = sys.argv[2]
             with open(train_dict_filename, 'r') as fp:
                 vocab = fp.readlines()
+                vocab = map(str.strip, vocab)                
         else:
             vocab = None
 
-    p_lhs_rhs = build_grammer(grammer_filename)
-    
+    p_lhs_rhs = build_grammer(grammer_filename)    
     for line in sys.stdin:
         print cky(p_lhs_rhs, line.strip().split(), vocab)
 
