@@ -10,51 +10,87 @@ def CKY(grammar,sentence):
     for i,tup_word in enumerate(sentence):
         word = tuple([tup_word[1]])
         max_lhs = max(grammar[word], key=grammar[word].get)
-        best_cky[max_lhs][(i,i+1)] = grammar[word][max_lhs]
+        best_cky[(i,i+1)][max_lhs] = grammar[word][max_lhs]
 
 
+    print('kdfkdfjkdjf')
 
 
-
-    for diff in range(1,len_sentence):
-        updated = False
+    for diff in range(2,len_sentence):
         for i in range(len_sentence-diff):
             j=i+diff    ####
+
+            ################ Binary Rules
             best_val = float('-inf')
+            best_node = None
+            updated = False
             for k in range(i + 1, j):
+                for branch1 in best_cky[(i,k)].keys():
+                    for branch2 in best_cky[(k,j)].keys():
+                        rhs = (branch1[0],branch2[0])
 
-                for rhs in grammar:
-                    for lhs,prob in grammar[rhs].items():
-                        ############################
-                        if len(rhs)==1:
-                            continue
-                            #temp_val = prob * best_cky[rhs][(i,j)]
+                        for lhs,prob in grammar[rhs].items():
 
-                        else:
-                            y = tuple([rhs[0]])
-                            z = tuple([rhs[1]])
-                            temp_val = prob * best_cky[y][(i, k)] * best_cky[z][(k, j)]
+                             ############################
+                            if len(rhs)==1:
+                                continue
+                                #temp_val = prob * best_cky[rhs][(i,j)]
 
-                        if temp_val>best_val:
-                            best_val = temp_val
-                            updated = True
+                            else:
+                                # y = tuple([rhs[0]])
+                                # z = tuple([rhs[1]])
+                                temp_val = prob * best_cky[(i, k)][branch1] * best_cky[(k, j)][branch2]
+
+                            if temp_val>best_val:
+                                best_val = temp_val
+                                updated = True
+                                best_node = lhs
+
+            #### Unary Rules
             if updated:
-                best_cky[lhs][(i,j)] = best_val
+                best_cky[(i, j)][best_node] = best_val
+                updated = False
+
+            for k in range(i + 1, j):
+                branches = list(best_cky[(i, k)].keys())
+                for branch1 in branches:
+                    rhs = branch1
+                    for lhs,prob in grammar[rhs].items():
+                        temp_val = prob * best_cky[(i,k)][rhs]
+                        if temp_val > best_cky[(i,k)][lhs]:
+                            best_cky[(i,k)][lhs] = temp_val
+
+                branches = list(best_cky[(k,j)].keys())
+                for branch2 in branches:
+                    rhs = branch2
+                    for lhs, prob in grammar[rhs].items():
+                        temp_val = prob * best_cky[(k,j)][rhs]
+                        if temp_val > best_cky[(k,j)][lhs]:
+                            best_cky[(k,j)][lhs] = temp_val
+
+
+
+
+
 
 
             #################################
-            rhs=lhs
-            best_val = best_cky[rhs][(i,j)]
-            best_lhs = None
-            for lhs in grammar[rhs]:
-                if len(lhs)==1:
-                    prob = best_cky[rhs][(i,j)] * grammar[rhs][lhs]
-                    if prob > best_val:
-                        best_val = prob
-                        best_lhs = lhs
+            if updated:
+                best_cky[(i,j)][best_node] = best_val
 
 
-            best_cky[best_lhs][(i,j)] = best_val
+                rhs=best_node
+                best_val = best_cky[rhs][(i,j)]
+                best_node = None
+                for lhs in grammar[rhs]:
+                    if len(lhs)==1:
+                        prob = best_cky[(i,j)][rhs] * grammar[rhs][lhs]
+                        if prob > best_val:
+                            best_val = prob
+                            best_node = lhs
+
+
+
 
 
 
